@@ -86,6 +86,14 @@ const Login = ({ onLogin, onShowRegister }) => {
               </div>
             </div>
 
+            <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-md">
+              <h4 className="text-sm font-medium text-blue-800 mb-2">Test Credentials:</h4>
+              <div className="text-xs text-blue-700 space-y-1">
+                <div><strong>Admin:</strong> admin@test.com / admin123</div>
+                <div><strong>User:</strong> user@test.com / user123</div>
+                <div><strong>Finance:</strong> finance@test.com / finance123</div>
+              </div>
+            </div>
             <div className="mt-6">
               <button
                 type="button"

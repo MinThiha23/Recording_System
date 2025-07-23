@@ -144,7 +144,6 @@ const UserManagement = ({ users, setUsers }) => {
     password: '',
     role: 'user',
     excoLocation: '',
-    budgetContribution: '',
     contactNo: '',
     picture: null
   });
@@ -177,7 +176,6 @@ const UserManagement = ({ users, setUsers }) => {
         email: newUser.email,
         role: newUser.role,
         excoLocation: newUser.excoLocation,
-        budgetContribution: newUser.budgetContribution,
         contactNo: newUser.contactNo,
         picture: newUser.picture ? newUser.picture.name : null,
         created_at: new Date().toISOString()
@@ -191,7 +189,6 @@ const UserManagement = ({ users, setUsers }) => {
         password: '',
         role: 'user',
         excoLocation: '',
-        budgetContribution: '',
         contactNo: '',
         picture: null
       });
@@ -435,19 +432,6 @@ const UserManagement = ({ users, setUsers }) => {
                 </div>
 
                 {/* Budget Contribution */}
-                <div>
-                  <label htmlFor="budgetContribution" className="block text-gray-700 text-sm font-medium mb-2">Budget Contribution (RM)</label>
-                  <input
-                    type="number"
-                    id="budgetContribution"
-                    name="budgetContribution"
-                    step="0.01"
-                    className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                    value={newUser.budgetContribution}
-                    onChange={(e) => setNewUser({ ...newUser, budgetContribution: e.target.value })}
-                    placeholder="0.00"
-                  />
-                </div>
 
                 {/* Contact Number */}
                 <div>
@@ -492,7 +476,6 @@ const UserManagement = ({ users, setUsers }) => {
                       password: '',
                       role: 'user',
                       excoLocation: '',
-                      budgetContribution: '',
                       contactNo: '',
                       picture: null
                     });

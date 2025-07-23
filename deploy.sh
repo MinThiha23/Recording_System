@@ -5,6 +5,10 @@
 
 set -e  # Exit on any error
 
+# Ensure script runs from the directory where it's located
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$SCRIPT_DIR"
+
 echo "🚀 Starting Recording System Deployment..."
 
 # Colors for output

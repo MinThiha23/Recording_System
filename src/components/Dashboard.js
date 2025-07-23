@@ -1,16 +1,46 @@
 import React from 'react';
 import { 
-  Users, 
-  FileText, 
-  DollarSign, 
-  CheckCircle, 
-  Clock, 
-  XCircle,
-  TrendingUp,
-  UserCheck
-} from 'lucide-react';
+  BarChart, 
+  Bar, 
+  XAxis, 
+  YAxis, 
+  CartesianGrid, 
+  Tooltip, 
+  Legend, 
+  PieChart, 
+  Pie, 
+  Cell, 
+  LineChart, 
+  Line, 
+  ResponsiveContainer,
+  Area,
+  AreaChart
+} from 'recharts';
 
 const Dashboard = ({ currentUser, programs, setCurrentPage }) => {
+  // Prepare data for charts
+  const statusData = [
+    { name: 'Approved', value: programs.filter(p => p.status === 'approved').length, color: '#10B981' },
+    { name: 'Pending', value: programs.filter(p => p.status === 'pending' || p.status === 'under_review').length, color: '#F59E0B' },
+    { name: 'Rejected', value: programs.filter(p => p.status === 'rejected').length, color: '#EF4444' },
+    { name: 'Draft', value: programs.filter(p => p.status === 'draft').length, color: '#6B7280' }
+  ];
+
+  const budgetData = programs.map(program => ({
+    name: program.name.length > 15 ? program.name.substring(0, 15) + '...' : program.name,
+    budget: parseFloat(program.budget) || 0,
+    status: program.status
+  })).slice(0, 6); // Show top 6 programs
+
+  const monthlyData = [
+    { month: 'Jan', programs: 4, budget: 45000 },
+    { month: 'Feb', programs: 6, budget: 52000 },
+    { month: 'Mar', programs: 8, budget: 48000 },
+    { month: 'Apr', programs: 5, budget: 61000 },
+    { month: 'May', programs: 7, budget: 55000 },
+    { month: 'Jun', programs: programs.length, budget: programs.reduce((sum, p) => sum + (parseFloat(p.budget) || 0), 0) }
+  ];
+
   const getStatusColor = (status) => {
     switch (status) {
       case 'approved':
@@ -67,6 +97,162 @@ const Dashboard = ({ currentUser, programs, setCurrentPage }) => {
       </div>
 
       {/* Statistics Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg shadow-lg p-6 text-white">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-blue-100 text-sm font-medium">Total Programs</p>
+              <p className="text-3xl font-bold">{programs.length}</p>
+              <p className="text-blue-100 text-xs mt-1">+12% from last month</p>
+            </div>
+            <div className="p-3 bg-blue-400 bg-opacity-30 rounded-full">
+              <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-gradient-to-r from-green-500 to-green-600 rounded-lg shadow-lg p-6 text-white">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-green-100 text-sm font-medium">Approved</p>
+              <p className="text-3xl font-bold">{programs.filter(p => p.status === 'approved').length}</p>
+              <p className="text-green-100 text-xs mt-1">+8% from last month</p>
+            </div>
+            <div className="p-3 bg-green-400 bg-opacity-30 rounded-full">
+              <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-gradient-to-r from-yellow-500 to-yellow-600 rounded-lg shadow-lg p-6 text-white">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-yellow-100 text-sm font-medium">Pending</p>
+              <p className="text-3xl font-bold">
+                {programs.filter(p => p.status === 'pending' || p.status === 'under_review').length}
+              </p>
+              <p className="text-yellow-100 text-xs mt-1">-3% from last month</p>
+            </div>
+            <div className="p-3 bg-yellow-400 bg-opacity-30 rounded-full">
+              <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-gradient-to-r from-purple-500 to-purple-600 rounded-lg shadow-lg p-6 text-white">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-purple-100 text-sm font-medium">Total Budget</p>
+              <p className="text-3xl font-bold">
+                RM {(programs.reduce((sum, p) => sum + (parseFloat(p.budget) || 0), 0) / 1000).toFixed(0)}K
+              </p>
+              <p className="text-purple-100 text-xs mt-1">+15% from last month</p>
+            </div>
+            <div className="p-3 bg-purple-400 bg-opacity-30 rounded-full">
+              <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Charts Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Program Status Pie Chart */}
+        <div className="bg-white rounded-lg shadow-md p-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Program Status Distribution</h3>
+          <ResponsiveContainer width="100%" height={300}>
+            <PieChart>
+              <Pie
+                data={statusData}
+                cx="50%"
+                cy="50%"
+                labelLine={false}
+                label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                outerRadius={80}
+                fill="#8884d8"
+                dataKey="value"
+              >
+                {statusData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={entry.color} />
+                ))}
+              </Pie>
+              <Tooltip />
+            </PieChart>
+          </ResponsiveContainer>
+        </div>
+
+        {/* Budget Bar Chart */}
+        <div className="bg-white rounded-lg shadow-md p-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Program Budgets</h3>
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={budgetData}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="name" angle={-45} textAnchor="end" height={80} />
+              <YAxis />
+              <Tooltip formatter={(value) => [`RM ${value.toLocaleString()}`, 'Budget']} />
+              <Bar dataKey="budget" fill="#3B82F6" />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+
+      {/* Monthly Trends */}
+      <div className="bg-white rounded-lg shadow-md p-6">
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">Monthly Trends</h3>
+        <ResponsiveContainer width="100%" height={400}>
+          <AreaChart data={monthlyData}>
+            <defs>
+              <linearGradient id="colorPrograms" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="#3B82F6" stopOpacity={0.8}/>
+                <stop offset="95%" stopColor="#3B82F6" stopOpacity={0}/>
+              </linearGradient>
+              <linearGradient id="colorBudget" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="#10B981" stopOpacity={0.8}/>
+                <stop offset="95%" stopColor="#10B981" stopOpacity={0}/>
+              </linearGradient>
+            </defs>
+            <XAxis dataKey="month" />
+            <YAxis yAxisId="left" />
+            <YAxis yAxisId="right" orientation="right" />
+            <CartesianGrid strokeDasharray="3 3" />
+            <Tooltip 
+              formatter={(value, name) => [
+                name === 'programs' ? value : `RM ${value.toLocaleString()}`,
+                name === 'programs' ? 'Programs' : 'Budget'
+              ]}
+            />
+            <Legend />
+            <Area
+              yAxisId="left"
+              type="monotone"
+              dataKey="programs"
+              stroke="#3B82F6"
+              fillOpacity={1}
+              fill="url(#colorPrograms)"
+              name="Programs"
+            />
+            <Area
+              yAxisId="right"
+              type="monotone"
+              dataKey="budget"
+              stroke="#10B981"
+              fillOpacity={1}
+              fill="url(#colorBudget)"
+              name="Budget"
+            />
+          </AreaChart>
+        </ResponsiveContainer>
+      </div>
+
+      {/* Original Statistics Cards - REMOVED */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <div className="bg-white rounded-lg shadow-md p-6">
           <div className="flex items-center">

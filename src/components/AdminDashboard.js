@@ -1,4 +1,21 @@
 import React, { useState } from 'react';
+import { 
+  BarChart, 
+  Bar, 
+  XAxis, 
+  YAxis, 
+  CartesianGrid, 
+  Tooltip, 
+  Legend, 
+  PieChart, 
+  Pie, 
+  Cell, 
+  LineChart, 
+  Line, 
+  ResponsiveContainer,
+  Area,
+  AreaChart
+} from 'recharts';
 
 const AdminDashboard = ({ programs, users, setCurrentPage, setPrograms, setUsers }) => {
   const [selectedProgram, setSelectedProgram] = useState(null);
@@ -6,6 +23,35 @@ const AdminDashboard = ({ programs, users, setCurrentPage, setPrograms, setUsers
   const [showUserModal, setShowUserModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [statusFilter, setStatusFilter] = useState('all');
+
+  // Prepare data for charts
+  const userRoleData = [
+    { name: 'Users', value: users.filter(u => u.role === 'user').length, color: '#3B82F6' },
+    { name: 'Admin', value: users.filter(u => u.role === 'admin').length, color: '#10B981' },
+    { name: 'Finance', value: users.filter(u => u.role === 'staff_finance').length, color: '#F59E0B' },
+    { name: 'PA Staff', value: users.filter(u => u.role === 'staff_pa').length, color: '#EF4444' },
+    { name: 'MMK Staff', value: users.filter(u => u.role === 'staff_mmk').length, color: '#8B5CF6' }
+  ];
+
+  const programStatusData = [
+    { name: 'Approved', value: programs.filter(p => p.status === 'approved').length, color: '#10B981' },
+    { name: 'Pending', value: programs.filter(p => p.status === 'pending').length, color: '#F59E0B' },
+    { name: 'Under Review', value: programs.filter(p => p.status === 'under_review').length, color: '#3B82F6' },
+    { name: 'Rejected', value: programs.filter(p => p.status === 'rejected').length, color: '#EF4444' }
+  ];
+
+  const budgetByStatusData = [
+    { 
+      status: 'Approved', 
+      budget: programs.filter(p => p.status === 'approved').reduce((sum, p) => sum + (parseFloat(p.budget) || 0), 0),
+      count: programs.filter(p => p.status === 'approved').length
+    },
+    { 
+      status: 'Pending', 
+      budget: programs.filter(p => p.status === 'pending').reduce((sum, p) => sum + (parseFloat(p.budget) || 0), 0),
+      count: programs.filter(p => p.status === 'pending').length
+    }
+  ];
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -78,65 +124,139 @@ const AdminDashboard = ({ programs, users, setCurrentPage, setPrograms, setUsers
 
       {/* Statistics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div className="bg-white rounded-lg shadow-md p-6">
+        <div className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg shadow-lg p-6 text-white">
           <div className="flex items-center">
-            <div className="p-3 rounded-full bg-blue-100">
+            <div className="p-3 rounded-full bg-blue-400 bg-opacity-30">
               <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
               </svg>
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Total Users</p>
-              <p className="text-2xl font-semibold text-gray-900">{users.length}</p>
+              <p className="text-sm font-medium text-blue-100">Total Users</p>
+              <p className="text-2xl font-semibold text-white">{users.length}</p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow-md p-6">
+        <div className="bg-gradient-to-r from-green-500 to-green-600 rounded-lg shadow-lg p-6 text-white">
           <div className="flex items-center">
-            <div className="p-3 rounded-full bg-green-100">
+            <div className="p-3 rounded-full bg-green-400 bg-opacity-30">
               <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
               </svg>
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Total Programs</p>
-              <p className="text-2xl font-semibold text-gray-900">{programs.length}</p>
+              <p className="text-sm font-medium text-green-100">Total Programs</p>
+              <p className="text-2xl font-semibold text-white">{programs.length}</p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow-md p-6">
+        <div className="bg-gradient-to-r from-yellow-500 to-yellow-600 rounded-lg shadow-lg p-6 text-white">
           <div className="flex items-center">
-            <div className="p-3 rounded-full bg-yellow-100">
+            <div className="p-3 rounded-full bg-yellow-400 bg-opacity-30">
               <svg className="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Pending Review</p>
-              <p className="text-2xl font-semibold text-gray-900">
+              <p className="text-sm font-medium text-yellow-100">Pending Review</p>
+              <p className="text-2xl font-semibold text-white">
                 {programs.filter(p => p.status === 'pending' || p.status === 'under_review').length}
               </p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow-md p-6">
+        <div className="bg-gradient-to-r from-purple-500 to-purple-600 rounded-lg shadow-lg p-6 text-white">
           <div className="flex items-center">
-            <div className="p-3 rounded-full bg-purple-100">
+            <div className="p-3 rounded-full bg-purple-400 bg-opacity-30">
               <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
               </svg>
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Total Budget</p>
-              <p className="text-2xl font-semibold text-gray-900">
+              <p className="text-sm font-medium text-purple-100">Total Budget</p>
+              <p className="text-2xl font-semibold text-white">
                 RM {programs.reduce((sum, p) => sum + (parseFloat(p.budget) || 0), 0).toLocaleString()}
               </p>
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Charts Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* User Roles Distribution */}
+        <div className="bg-white rounded-lg shadow-md p-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">User Roles Distribution</h3>
+          <ResponsiveContainer width="100%" height={300}>
+            <PieChart>
+              <Pie
+                data={userRoleData}
+                cx="50%"
+                cy="50%"
+                labelLine={false}
+                label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                outerRadius={80}
+                fill="#8884d8"
+                dataKey="value"
+              >
+                {userRoleData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={entry.color} />
+                ))}
+              </Pie>
+              <Tooltip />
+            </PieChart>
+          </ResponsiveContainer>
+        </div>
+
+        {/* Program Status Distribution */}
+        <div className="bg-white rounded-lg shadow-md p-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Program Status Overview</h3>
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={programStatusData}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="name" />
+              <YAxis />
+              <Tooltip />
+              <Bar dataKey="value" fill="#3B82F6" />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+
+      {/* Budget Analysis */}
+      <div className="bg-white rounded-lg shadow-md p-6">
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">Budget Analysis by Status</h3>
+        <ResponsiveContainer width="100%" height={400}>
+          <AreaChart data={budgetByStatusData}>
+            <defs>
+              <linearGradient id="colorBudget" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="#10B981" stopOpacity={0.8}/>
+                <stop offset="95%" stopColor="#10B981" stopOpacity={0}/>
+              </linearGradient>
+            </defs>
+            <XAxis dataKey="status" />
+            <YAxis />
+            <CartesianGrid strokeDasharray="3 3" />
+            <Tooltip 
+              formatter={(value, name) => [
+                name === 'budget' ? `RM ${value.toLocaleString()}` : value,
+                name === 'budget' ? 'Total Budget' : 'Program Count'
+              ]}
+            />
+            <Legend />
+            <Area
+              type="monotone"
+              dataKey="budget"
+              stroke="#10B981"
+              fillOpacity={1}
+              fill="url(#colorBudget)"
+              name="Budget"
+            />
+          </AreaChart>
+        </ResponsiveContainer>
       </div>
 
       {/* Programs Management Table */}

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { mockLogin, mockRegister, mockGetCurrentUser, mockGetPrograms, mockGetUsers, mockCreateProgram } from './utils/mockAuth';
+import { mockLogin, mockRegister, mockGetCurrentUser, mockGetPrograms, mockGetUsers } from './utils/mockAuth';
 import Login from './components/Login';
 import Register from './components/Register';
 import Dashboard from './components/Dashboard';

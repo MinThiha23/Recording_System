@@ -1,0 +1,17 @@
+RewriteEngine On
+
+# Handle CORS preflight requests
+RewriteCond %{REQUEST_METHOD} OPTIONS
+RewriteRule ^(.*)$ index.php [QSA,L]
+
+# Route all requests to index.php
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ index.php [QSA,L]
+
+# Set environment variables (if not set in server config)
+SetEnv DB_HOST localhost
+SetEnv DB_NAME recording_system
+SetEnv DB_USER root
+SetEnv DB_PASSWORD 235203mth!
+SetEnv JWT_SECRET your-secret-key

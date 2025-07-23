@@ -10,7 +10,7 @@ import {
   UserCheck
 } from 'lucide-react';
 
-const Dashboard = ({ currentUser, userPrograms, setCurrentPage }) => {
+const Dashboard = ({ currentUser, programs, setCurrentPage }) => {
   const getStatusColor = (status) => {
     switch (status) {
       case 'approved':
@@ -77,7 +77,7 @@ const Dashboard = ({ currentUser, userPrograms, setCurrentPage }) => {
             </div>
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-600">Total Programs</p>
-              <p className="text-2xl font-semibold text-gray-900">{userPrograms.length}</p>
+              <p className="text-2xl font-semibold text-gray-900">{programs.length}</p>
             </div>
           </div>
         </div>
@@ -92,7 +92,7 @@ const Dashboard = ({ currentUser, userPrograms, setCurrentPage }) => {
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-600">Approved</p>
               <p className="text-2xl font-semibold text-gray-900">
-                {userPrograms.filter(p => p.status === 'approved').length}
+                {programs.filter(p => p.status === 'approved').length}
               </p>
             </div>
           </div>
@@ -108,7 +108,7 @@ const Dashboard = ({ currentUser, userPrograms, setCurrentPage }) => {
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-600">Pending</p>
               <p className="text-2xl font-semibold text-gray-900">
-                {userPrograms.filter(p => p.status === 'pending' || p.status === 'under_review').length}
+                {programs.filter(p => p.status === 'pending' || p.status === 'under_review').length}
               </p>
             </div>
           </div>
@@ -124,7 +124,7 @@ const Dashboard = ({ currentUser, userPrograms, setCurrentPage }) => {
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-600">Rejected</p>
               <p className="text-2xl font-semibold text-gray-900">
-                {userPrograms.filter(p => p.status === 'rejected').length}
+                {programs.filter(p => p.status === 'rejected').length}
               </p>
             </div>
           </div>
@@ -137,7 +137,7 @@ const Dashboard = ({ currentUser, userPrograms, setCurrentPage }) => {
           <h2 className="text-lg font-semibold text-gray-900">Your Programs</h2>
         </div>
         
-        {userPrograms.length === 0 ? (
+        {programs.length === 0 ? (
           <div className="text-center py-12">
             <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -179,7 +179,7 @@ const Dashboard = ({ currentUser, userPrograms, setCurrentPage }) => {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {userPrograms.map((program) => (
+                {programs.map((program) => (
                   <tr key={program.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm font-medium text-gray-900">{program.name}</div>

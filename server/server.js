@@ -1,41 +1,59 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
-require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  credentials: true
+}));
 app.use(express.json());
+
+// Serve static files from React build
 app.use(express.static(path.join(__dirname, '../build')));
 
-// Basic health check route
-app.get('/api/health', (req, res) => {
-  res.json({ status: 'Server is running', timestamp: new Date().toISOString() });
+// Health check route
+app.get('/health', (req, res) => {
+  res.json({ 
+    status: 'OK', 
+    timestamp: new Date().toISOString(),
+    environment: 'development'
+  });
 });
 
-// Mock API routes for the frontend
+// API routes
 app.get('/api/programs', (req, res) => {
+  res.json([
+    {
+      id: 1,
+      name: 'Community Development Program',
+      budget: 50000,
+      recipientName: 'Community Center',
+      status: 'approved',
+      created_at: '2024-01-15T10:00:00Z',
+      updated_at: '2024-01-20T14:30:00Z'
+    },
+    {
+      id: 2,
+      name: 'Youth Education Initiative',
+      budget: 25000,
+      recipientName: 'Local School',
+      status: 'pending',
+      created_at: '2024-01-18T09:15:00Z',
+      updated_at: '2024-01-18T09:15:00Z'
+    }
+  ]);
+});
+
+app.get('/api/users/current', (req, res) => {
   res.json({
-    success: true,
-    programs: [
-      {
-        id: 1,
-        title: 'Community Development Program',
-        status: 'approved',
-        budget: 50000,
-        createdAt: '2024-01-15'
-      },
-      {
-        id: 2,
-        title: 'Education Initiative',
-        status: 'pending',
-        budget: 35000,
-        createdAt: '2024-02-01'
-      }
-    ]
+    id: 1,
+    name: 'John Doe',
+    email: 'john@example.com',
+    role: 'user'
   });
 });
 
@@ -45,5 +63,7 @@ app.get('*', (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+  console.log(`🚀 Server is running on port ${PORT}`);
+  console.log(`📱 Frontend: http://localhost:${PORT}`);
+  console.log(`🔍 Health check: http://localhost:${PORT}/health`);
 });

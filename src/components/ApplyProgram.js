@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { mockCreateProgram } from '../utils/mockAuth';
 
 const ApplyProgram = ({ currentUser, onProgramAdded }) => {
   const [formData, setFormData] = useState({
@@ -40,48 +41,32 @@ const ApplyProgram = ({ currentUser, onProgramAdded }) => {
     setLoading(true);
 
     try {
-      const formDataToSend = new FormData();
-      formDataToSend.append('name', formData.name);
-      formDataToSend.append('description', formData.description);
-      formDataToSend.append('budget', formData.budget);
-      formDataToSend.append('recipientName', formData.recipientName);
-      formDataToSend.append('remarks', remarks);
-
-      // Append documents
-      Object.keys(formData.documents).forEach(key => {
-        if (formData.documents[key]) {
-          formDataToSend.append(key, formData.documents[key]);
-        }
-      });
-
       const token = localStorage.getItem('token');
-      const response = await fetch('/api/programs', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        },
-        body: formDataToSend
-      });
+      
+      const programData = {
+        name: formData.name,
+        description: formData.description,
+        budget: formData.budget,
+        recipientName: formData.recipientName,
+        remarks: remarks
+      };
 
-      if (response.ok) {
-        alert('Program application submitted successfully!');
-        onProgramAdded();
-        // Reset form
-        setFormData({
-          name: '',
-          description: '',
-          budget: '',
-          recipientName: '',
-          documents: {}
-        });
-        setRemarks('');
-      } else {
-        const errorData = await response.json();
-        alert(errorData.error || 'Failed to submit program application');
-      }
+      await mockCreateProgram(token, programData);
+      alert('Program application submitted successfully!');
+      onProgramAdded();
+      
+      // Reset form
+      setFormData({
+        name: '',
+        description: '',
+        budget: '',
+        recipientName: '',
+        documents: {}
+      });
+      setRemarks('');
     } catch (error) {
       console.error('Error submitting program:', error);
-      alert('An error occurred while submitting the program');
+      alert(error.message || 'An error occurred while submitting the program');
     } finally {
       setLoading(false);
     }

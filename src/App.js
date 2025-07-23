@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { mockLogin, mockRegister, mockGetCurrentUser, mockGetPrograms, mockGetUsers, mockCreateProgram } from './utils/mockAuth';
 import Login from './components/Login';
 import Register from './components/Register';
 import Dashboard from './components/Dashboard';
@@ -32,41 +33,29 @@ function App() {
   const fetchCurrentUser = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('/api/users/current', {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      if (response.ok) {
-        const userData = await response.json();
-        setCurrentUser(userData);
-        setIsLoggedIn(true);
-        // Set default page based on role
-        if (userData.role === 'admin') {
-          setCurrentPage('admin-dashboard');
-        } else if (userData.role === 'finance') {
-          setCurrentPage('finance-dashboard');
-        } else {
-          setCurrentPage('dashboard');
-        }
+      const userData = await mockGetCurrentUser(token);
+      setCurrentUser(userData);
+      setIsLoggedIn(true);
+      // Set default page based on role
+      if (userData.role === 'admin') {
+        setCurrentPage('admin-dashboard');
+      } else if (userData.role === 'finance') {
+        setCurrentPage('finance-dashboard');
+      } else {
+        setCurrentPage('dashboard');
       }
     } catch (error) {
       console.error('Error fetching current user:', error);
+      // If token is invalid, clear it
+      localStorage.removeItem('token');
     }
   };
 
   const fetchPrograms = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('/api/programs', {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setPrograms(data);
-      }
+      const data = await mockGetPrograms(token);
+      setPrograms(data);
     } catch (error) {
       console.error('Error fetching programs:', error);
     }
@@ -75,15 +64,8 @@ function App() {
   const fetchUsers = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('/api/users', {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setUsers(data);
-      }
+      const data = await mockGetUsers(token);
+      setUsers(data);
     } catch (error) {
       console.error('Error fetching users:', error);
     }
@@ -91,60 +73,33 @@ function App() {
 
   const handleLogin = async (credentials) => {
     try {
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(credentials),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        localStorage.setItem('token', data.token);
-        setCurrentUser(data.user);
-        setIsLoggedIn(true);
-        
-        // Set page based on role
-        if (data.user.role === 'admin') {
-          setCurrentPage('admin-dashboard');
-        } else if (data.user.role === 'finance') {
-          setCurrentPage('finance-dashboard');
-        } else {
-          setCurrentPage('dashboard');
-        }
+      const data = await mockLogin(credentials.email, credentials.password);
+      localStorage.setItem('token', data.token);
+      setCurrentUser(data.user);
+      setIsLoggedIn(true);
+      
+      // Set page based on role
+      if (data.user.role === 'admin') {
+        setCurrentPage('admin-dashboard');
+      } else if (data.user.role === 'finance') {
+        setCurrentPage('finance-dashboard');
       } else {
-        const errorData = await response.json();
-        alert(errorData.error || 'Login failed. Please check your credentials.');
+        setCurrentPage('dashboard');
       }
     } catch (error) {
       console.error('Login error:', error);
-      alert('An error occurred during login. Please try again.');
+      alert(error.message || 'An error occurred during login. Please try again.');
     }
   };
 
   const handleRegister = async (userData) => {
     try {
-      const formData = new FormData();
-      Object.keys(userData).forEach(key => {
-        formData.append(key, userData[key]);
-      });
-
-      const response = await fetch('/api/auth/register', {
-        method: 'POST',
-        body: formData,
-      });
-
-      if (response.ok) {
-        alert('Registration successful! Please login.');
-        setCurrentPage('login');
-      } else {
-        const errorData = await response.json();
-        alert(errorData.error || 'Registration failed. Please try again.');
-      }
+      await mockRegister(userData);
+      alert('Registration successful! Please login.');
+      setCurrentPage('login');
     } catch (error) {
       console.error('Registration error:', error);
-      alert('An error occurred during registration. Please try again.');
+      alert(error.message || 'An error occurred during registration. Please try again.');
     }
   };
 

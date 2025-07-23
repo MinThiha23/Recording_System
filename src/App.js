@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { mockLogin, mockRegister, mockGetCurrentUser, mockGetPrograms, mockGetUsers } from './utils/mockAuth';
+import { API_ENDPOINTS, apiCall } from './config/api';
 import Login from './components/Login';
 import Register from './components/Register';
 import Dashboard from './components/Dashboard';
@@ -34,7 +34,7 @@ function App() {
   const fetchCurrentUser = async () => {
     try {
       const token = localStorage.getItem('token');
-      const userData = await mockGetCurrentUser(token);
+      const userData = await apiCall(API_ENDPOINTS.CURRENT_USER);
       setCurrentUser(userData);
       setIsLoggedIn(true);
       // Set default page based on role
@@ -55,7 +55,7 @@ function App() {
   const fetchPrograms = async () => {
     try {
       const token = localStorage.getItem('token');
-      const data = await mockGetPrograms(token);
+      const data = await apiCall(API_ENDPOINTS.PROGRAMS);
       setPrograms(data);
     } catch (error) {
       console.error('Error fetching programs:', error);
@@ -65,7 +65,7 @@ function App() {
   const fetchUsers = async () => {
     try {
       const token = localStorage.getItem('token');
-      const data = await mockGetUsers(token);
+      const data = await apiCall(API_ENDPOINTS.USERS);
       setUsers(data);
     } catch (error) {
       console.error('Error fetching users:', error);
@@ -74,15 +74,18 @@ function App() {
 
   const handleLogin = async (credentials) => {
     try {
-      const data = await mockLogin(credentials.email, credentials.password);
+      const data = await apiCall(API_ENDPOINTS.LOGIN, {
+        method: 'POST',
+        body: JSON.stringify(credentials)
+      });
       localStorage.setItem('token', data.token);
-      setCurrentUser(data.user);
+      setCurrentUser(data);
       setIsLoggedIn(true);
       
       // Set page based on role
-      if (data.user.role === 'admin') {
+      if (data.role === 'admin') {
         setCurrentPage('admin-dashboard');
-      } else if (data.user.role === 'finance') {
+      } else if (data.role === 'staff_finance') {
         setCurrentPage('finance-dashboard');
       } else {
         setCurrentPage('dashboard');
@@ -95,7 +98,17 @@ function App() {
 
   const handleRegister = async (userData) => {
     try {
-      await mockRegister(userData);
+      const formData = new FormData();
+      Object.keys(userData).forEach(key => {
+        if (userData[key] !== null && userData[key] !== undefined) {
+          formData.append(key, userData[key]);
+        }
+      });
+      
+      await fetch(API_ENDPOINTS.CREATE_USER, {
+        method: 'POST',
+        body: formData
+      });
       alert('Registration successful! Please login.');
       setCurrentPage('login');
     } catch (error) {
@@ -122,7 +135,7 @@ function App() {
           { name: 'Dashboard', page: 'admin-dashboard' },
           { name: 'User Management', page: 'user-management' }
         ];
-      case 'finance':
+      case 'staff_finance':
         return [
           { name: 'Dashboard', page: 'finance-dashboard' },
           { name: 'Programs', page: 'programs' }
@@ -167,7 +180,7 @@ function App() {
             setPrograms={setPrograms}
             setUsers={setUsers}
           />;
-        } else if (currentUser.role === 'finance') {
+        } else if (currentUser.role === 'staff_finance') {
           return <FinanceDashboard programs={programs} setPrograms={setPrograms} />;
         } else {
           return <Dashboard programs={programs} currentUser={currentUser} setCurrentPage={setCurrentPage} />;

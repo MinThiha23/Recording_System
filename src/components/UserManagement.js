@@ -167,34 +167,48 @@ const UserManagement = ({ users, setUsers }) => {
     setSuccess('');
 
     try {
-      // Create new user with mock ID
-      const newUserData = {
-        id: users.length + 1,
-        name: newUser.name,
-        email: newUser.email,
-        role: newUser.role,
-        excoLocation: newUser.excoLocation,
-        contactNo: newUser.contactNo,
-        picture: newUser.picture ? newUser.picture.name : null,
-        created_at: new Date().toISOString()
-      };
+      const formData = new FormData();
+      formData.append('name', newUser.name);
+      formData.append('email', newUser.email);
+      formData.append('password', newUser.password);
+      formData.append('role', newUser.role);
+      formData.append('excoLocation', newUser.excoLocation || '');
+      formData.append('contactNo', newUser.contactNo);
+      if (newUser.picture) {
+        formData.append('picture', newUser.picture);
+      }
       
-      setUsers([...users, newUserData]);
-      setShowAddModal(false);
-      setNewUser({
-        name: '',
-        email: '',
-        password: '',
-        role: 'user',
-        excoLocation: '',
-        contactNo: '',
-        picture: null
+      const response = await fetch('http://localhost:5000/api/users', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: formData
       });
-      setPreviewImage(null);
-      setSuccess('User registered successfully');
+
+      if (response.ok) {
+        const newUserData = await response.json();
+        setUsers([...users, newUserData]);
+        setShowAddModal(false);
+        setNewUser({
+          name: '',
+          email: '',
+          password: '',
+          role: 'user',
+          excoLocation: '',
+          contactNo: '',
+          picture: null
+        });
+        setPreviewImage(null);
+        setSuccess('User registered successfully');
+      } else {
+        const errorData = await response.json();
+        setError(errorData.error || 'Failed to register user');
+      }
+      
     } catch (error) {
       console.error('Error adding user:', error);
-      setError('Failed to register user');
+      setError('Failed to connect to server');
     }
   };
 

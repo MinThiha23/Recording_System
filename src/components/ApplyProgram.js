@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { mockCreateProgram } from '../utils/mockAuth';
+import { API_ENDPOINTS, apiCall } from '../config/api';
 
 const ApplyProgram = ({ currentUser, onProgramAdded }) => {
   const [formData, setFormData] = useState({
@@ -41,29 +41,27 @@ const ApplyProgram = ({ currentUser, onProgramAdded }) => {
     setLoading(true);
 
     try {
-      const token = localStorage.getItem('token');
-      
       const programData = {
         name: formData.name,
-        description: formData.description,
         budget: formData.budget,
         recipientName: formData.recipientName,
-        remarks: remarks
       };
 
-      await mockCreateProgram(token, programData);
+      await apiCall(API_ENDPOINTS.CREATE_PROGRAM, {
+        method: 'POST',
+        body: JSON.stringify(programData)
+      });
+      
       alert('Program application submitted successfully!');
       onProgramAdded();
       
       // Reset form
       setFormData({
         name: '',
-        description: '',
         budget: '',
         recipientName: '',
         documents: {}
       });
-      setRemarks('');
     } catch (error) {
       console.error('Error submitting program:', error);
       alert(error.message || 'An error occurred while submitting the program');

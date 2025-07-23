@@ -142,11 +142,27 @@ const UserManagement = ({ users, setUsers }) => {
     name: '',
     email: '',
     password: '',
-    role: 'user'
+    role: 'user',
+    excoLocation: '',
+    budgetContribution: '',
+    contactNo: '',
+    picture: null
   });
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [previewImage, setPreviewImage] = useState(null);
   const { t } = useLanguage();
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setNewUser({ ...newUser, picture: file });
+      // Create preview
+      const reader = new FileReader();
+      reader.onload = (e) => setPreviewImage(e.target.result);
+      reader.readAsDataURL(file);
+    }
+  };
 
   const handleAddUser = async (e) => {
     e.preventDefault();
@@ -154,33 +170,36 @@ const UserManagement = ({ users, setUsers }) => {
     setSuccess('');
 
     try {
-      const response = await fetch('http://localhost:5000/api/users', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        },
-        body: JSON.stringify(newUser),
+      // Create new user with mock ID
+      const newUserData = {
+        id: users.length + 1,
+        name: newUser.name,
+        email: newUser.email,
+        role: newUser.role,
+        excoLocation: newUser.excoLocation,
+        budgetContribution: newUser.budgetContribution,
+        contactNo: newUser.contactNo,
+        picture: newUser.picture ? newUser.picture.name : null,
+        created_at: new Date().toISOString()
+      };
+      
+      setUsers([...users, newUserData]);
+      setShowAddModal(false);
+      setNewUser({
+        name: '',
+        email: '',
+        password: '',
+        role: 'user',
+        excoLocation: '',
+        budgetContribution: '',
+        contactNo: '',
+        picture: null
       });
-
-      if (response.ok) {
-        const data = await response.json();
-        setUsers([...users, data]);
-        setShowAddModal(false);
-        setNewUser({
-          name: '',
-          email: '',
-          password: '',
-          role: 'user'
-        });
-        setSuccess(t('User Added Successfully'));
-      } else {
-        const errorData = await response.json();
-        setError(errorData.error || t('failedToAddUser'));
-      }
+      setPreviewImage(null);
+      setSuccess('User registered successfully');
     } catch (error) {
       console.error('Error adding user:', error);
-      setError(t('failedToConnectToServer'));
+      setError('Failed to register user');
     }
   };
 
@@ -324,6 +343,178 @@ const UserManagement = ({ users, setUsers }) => {
 
       {/* Add User Modal */}
       {showAddModal && (
+        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-8 rounded-lg shadow-xl w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
+            <h3 className="text-2xl font-bold mb-6 text-gray-800">User Registration</h3>
+            <form onSubmit={handleAddUser} className="space-y-4">
+              {/* Profile Picture */}
+              <div className="flex flex-col items-center mb-6">
+                <div className="w-32 h-32 rounded-full border-4 border-gray-200 overflow-hidden bg-gray-100 flex items-center justify-center">
+                  {previewImage ? (
+                    <img src={previewImage} alt="Preview" className="w-full h-full object-cover" />
+                  ) : (
+                    <svg className="w-16 h-16 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                    </svg>
+                  )}
+                </div>
+                <label className="mt-4 cursor-pointer bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors duration-200">
+                  Upload Picture *
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileChange}
+                    className="hidden"
+                    required
+                  />
+                </label>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Name */}
+                <div>
+                  <label htmlFor="name" className="block text-gray-700 text-sm font-medium mb-2">Full Name *</label>
+                  <input
+                    type="text"
+                    id="name"
+                    name="name"
+                    className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                    value={newUser.name}
+                    onChange={(e) => setNewUser({ ...newUser, name: e.target.value })}
+                    required
+                    placeholder="Enter full name"
+                  />
+                </div>
+
+                {/* Email */}
+                <div>
+                  <label htmlFor="email" className="block text-gray-700 text-sm font-medium mb-2">Email Address *</label>
+                  <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                    value={newUser.email}
+                    onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
+                    required
+                    placeholder="Enter email address"
+                  />
+                </div>
+
+                {/* Role */}
+                <div>
+                  <label htmlFor="role" className="block text-gray-700 text-sm font-medium mb-2">Role *</label>
+                  <select
+                    id="role"
+                    name="role"
+                    className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                    value={newUser.role}
+                    onChange={(e) => setNewUser({ ...newUser, role: e.target.value })}
+                  >
+                    <option value="user">User</option>
+                    <option value="exco">EXCO</option>
+                    <option value="admin">Admin</option>
+                    <option value="staff_finance">Staff Finance</option>
+                    <option value="staff_pa">Staff PA</option>
+                    <option value="staff_mmk">Staff MMK</option>
+                  </select>
+                </div>
+
+                {/* EXCO Location */}
+                <div>
+                  <label htmlFor="excoLocation" className="block text-gray-700 text-sm font-medium mb-2">EXCO Location</label>
+                  <input
+                    type="text"
+                    id="excoLocation"
+                    name="excoLocation"
+                    className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                    value={newUser.excoLocation}
+                    onChange={(e) => setNewUser({ ...newUser, excoLocation: e.target.value })}
+                    placeholder="Enter EXCO location"
+                  />
+                </div>
+
+                {/* Budget Contribution */}
+                <div>
+                  <label htmlFor="budgetContribution" className="block text-gray-700 text-sm font-medium mb-2">Budget Contribution (RM)</label>
+                  <input
+                    type="number"
+                    id="budgetContribution"
+                    name="budgetContribution"
+                    step="0.01"
+                    className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                    value={newUser.budgetContribution}
+                    onChange={(e) => setNewUser({ ...newUser, budgetContribution: e.target.value })}
+                    placeholder="0.00"
+                  />
+                </div>
+
+                {/* Contact Number */}
+                <div>
+                  <label htmlFor="contactNo" className="block text-gray-700 text-sm font-medium mb-2">Contact Number *</label>
+                  <input
+                    type="tel"
+                    id="contactNo"
+                    name="contactNo"
+                    className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                    value={newUser.contactNo}
+                    onChange={(e) => setNewUser({ ...newUser, contactNo: e.target.value })}
+                    required
+                    placeholder="Enter contact number"
+                  />
+                </div>
+
+                {/* Password */}
+                <div>
+                  <label htmlFor="password" className="block text-gray-700 text-sm font-medium mb-2">Password *</label>
+                  <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                    value={newUser.password}
+                    onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
+                    required
+                    placeholder="Enter password"
+                  />
+                </div>
+              </div>
+
+              <div className="flex justify-end space-x-3 mt-6">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowAddModal(false);
+                    setPreviewImage(null);
+                    setNewUser({
+                      name: '',
+                      email: '',
+                      password: '',
+                      role: 'user',
+                      excoLocation: '',
+                      budgetContribution: '',
+                      contactNo: '',
+                      picture: null
+                    });
+                  }}
+                  className="px-5 py-2 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-100 transition duration-200"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700 transition duration-200"
+                >
+                  Register User
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Add User Modal - OLD VERSION REMOVED */}
+      {false && showAddModal && (
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-8 rounded-lg shadow-xl w-full max-w-md mx-4">
             <h3 className="text-2xl font-bold mb-6 text-gray-800">{t('Add New User')}</h3>

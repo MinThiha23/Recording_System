@@ -30,11 +30,55 @@ print_error() {
     echo -e "${RED}[ERROR]${NC} $1"
 }
 
+# Function to check and install build tools
+check_build_tools() {
+    print_status "Checking for build tools..."
+    
+    local missing_tools=()
+    
+    if ! command -v gcc &> /dev/null && ! command -v g++ &> /dev/null; then
+        missing_tools+=("build-essential")
+    fi
+    
+    if ! command -v python3 &> /dev/null; then
+        missing_tools+=("python3")
+    fi
+    
+    if ! command -v make &> /dev/null; then
+        missing_tools+=("make")
+    fi
+    
+    if [ ${#missing_tools[@]} -gt 0 ]; then
+        print_warning "Missing build tools required for native modules: ${missing_tools[*]}"
+        print_status "Attempting to install build tools..."
+        
+        # Try to install build tools (works on Ubuntu/Debian)
+        if command -v apt-get &> /dev/null; then
+            sudo apt-get update && sudo apt-get install -y build-essential python3 make
+        elif command -v yum &> /dev/null; then
+            sudo yum groupinstall -y "Development Tools" && sudo yum install -y python3
+        elif command -v apk &> /dev/null; then
+            sudo apk add --no-cache build-base python3 make
+        else
+            print_error "Could not automatically install build tools."
+            print_error "Please manually install: build-essential, python3, make"
+            print_error "On Ubuntu/Debian: sudo apt install build-essential python3 make"
+            print_error "On CentOS/RHEL: sudo yum groupinstall 'Development Tools' && sudo yum install python3"
+            exit 1
+        fi
+    else
+        print_status "Build tools are available."
+    fi
+}
+
 # Check if running as root
 if [[ $EUID -eq 0 ]]; then
    print_error "This script should not be run as root"
    exit 1
 fi
+
+# Check and install build tools first
+check_build_tools
 
 # Check if Node.js is installed
 if ! command -v node &> /dev/null; then

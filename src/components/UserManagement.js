@@ -105,11 +105,9 @@ const EditUserModal = ({ show, onClose, user, onSave }) => {
               value={editedUser.role || 'user'}
               onChange={handleChange}
             >
-              <option value="user">{t('user')}</option>
-              <option value="admin">{t('admin')}</option>
-              <option value="staff_finance">{t('staff_finance')}</option>
-              <option value="staff_pa">{t('staff_pa')}</option>
-              <option value="staff_mmk">Staff MMK</option>
+              <option value="user">User (EXCO)</option>
+              <option value="admin">Admin</option>
+              <option value="finance">Finance</option>
             </select>
           </div>
           <div className="flex justify-end space-x-3 mt-6">
@@ -408,12 +406,9 @@ const UserManagement = ({ users, setUsers }) => {
                     value={newUser.role}
                     onChange={(e) => setNewUser({ ...newUser, role: e.target.value })}
                   >
-                    <option value="user">User</option>
-                    <option value="exco">EXCO</option>
+                    <option value="user">User (EXCO)</option>
                     <option value="admin">Admin</option>
-                    <option value="staff_finance">Staff Finance</option>
-                    <option value="staff_pa">Staff PA</option>
-                    <option value="staff_mmk">Staff MMK</option>
+                    <option value="finance">Finance</option>
                   </select>
                 </div>
 

@@ -119,8 +119,7 @@ function App() {
       case 'admin':
         return [
           { name: 'Dashboard', page: 'admin-dashboard' },
-          { name: 'Users', page: 'users' },
-          { name: 'Programs', page: 'programs' }
+          { name: 'User Management', page: 'user-management' }
         ];
       case 'finance':
         return [
@@ -141,7 +140,13 @@ function App() {
     switch (currentPage) {
       case 'admin-dashboard':
         return currentUser.role === 'admin' ? 
-          <AdminDashboard programs={programs} users={users} setCurrentPage={setCurrentPage} /> : null;
+          <AdminDashboard 
+            programs={programs} 
+            users={users} 
+            setCurrentPage={setCurrentPage}
+            setPrograms={setPrograms}
+            setUsers={setUsers}
+          /> : null;
       case 'finance-dashboard':
         return currentUser.role === 'finance' ? 
           <FinanceDashboard programs={programs} setPrograms={setPrograms} /> : null;
@@ -149,9 +154,18 @@ function App() {
         return <Dashboard programs={programs} currentUser={currentUser} setCurrentPage={setCurrentPage} />;
       case 'apply-program':
         return <ApplyProgram currentUser={currentUser} onProgramAdded={fetchPrograms} />;
+      case 'user-management':
+        return currentUser.role === 'admin' ? 
+          <UserManagement users={users} setUsers={setUsers} /> : null;
       default:
         if (currentUser.role === 'admin') {
-          return <AdminDashboard programs={programs} users={users} setCurrentPage={setCurrentPage} />;
+          return <AdminDashboard 
+            programs={programs} 
+            users={users} 
+            setCurrentPage={setCurrentPage}
+            setPrograms={setPrograms}
+            setUsers={setUsers}
+          />;
         } else if (currentUser.role === 'finance') {
           return <FinanceDashboard programs={programs} setPrograms={setPrograms} />;
         } else {

@@ -6,6 +6,7 @@ import Dashboard from './components/Dashboard';
 import ApplyProgram from './components/ApplyProgram';
 import AdminDashboard from './components/AdminDashboard';
 import FinanceDashboard from './components/FinanceDashboard';
+import UserManagement from './components/UserManagement';
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);

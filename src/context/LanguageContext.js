@@ -40,7 +40,7 @@ export const LanguageProvider = ({ children }) => {
       translated = translated.replace(new RegExp(`{{${paramKey}}}`, 'g'), paramValue);
     }
     return translated;
-  }, [language]);
+  }, [language, translations]);
 
   const changeLanguage = (lang) => {
     setLanguage(lang);

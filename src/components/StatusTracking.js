@@ -20,26 +20,6 @@ function getStatusLabel(status) {
 }
 
 const StatusTracking = ({ users, setUsers, programs, setPrograms, payments, fetchUsers, fetchPrograms, currentUser }) => {
-  const handleProgramStatusChange = async (programId, newStatus) => {
-    try {
-      const response = await fetch(`http://localhost:5000/api/programs/${programId}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ status: newStatus }),
-      });
-
-      if (response.ok) {
-        fetchPrograms(); // Re-fetch programs to update the UI
-      } else {
-        console.error('Failed to update program status');
-      }
-    } catch (error) {
-      console.error('Error updating program status:', error);
-    }
-  };
-
   return (
     <div className="space-y-6">
       <h2 className="text-2xl font-bold text-gray-900">Status Tracking Overview</h2>

@@ -1,199 +1,71 @@
 import React, { useState, useEffect } from 'react';
-import { API_ENDPOINTS, apiCall } from './config/api';
-import Login from './components/Login';
-import Register from './components/Register';
 import Dashboard from './components/Dashboard';
-import ApplyProgram from './components/ApplyProgram';
-import AdminDashboard from './components/AdminDashboard';
-import FinanceDashboard from './components/FinanceDashboard';
-import UserManagement from './components/UserManagement';
 
 function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [currentPage, setCurrentPage] = useState('login');
-  const [currentUser, setCurrentUser] = useState(null);
-  const [programs, setPrograms] = useState([]);
-  const [users, setUsers] = useState([]);
-
-  useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      fetchCurrentUser();
-    }
-  }, []);
-
-  useEffect(() => {
-    if (isLoggedIn && currentUser) {
-      fetchPrograms();
-      if (currentUser.role === 'admin' || currentUser.role === 'finance') {
-        fetchUsers();
-      }
-    }
-  }, [isLoggedIn, currentUser]);
-
-  const fetchCurrentUser = async () => {
-    try {
-      const token = localStorage.getItem('token');
-      const userData = await apiCall(API_ENDPOINTS.CURRENT_USER);
-      setCurrentUser(userData);
-      setIsLoggedIn(true);
-      // Set default page based on role
-      if (userData.role === 'admin') {
-        setCurrentPage('admin-dashboard');
-      } else if (userData.role === 'finance') {
-        setCurrentPage('finance-dashboard');
-      } else {
-        setCurrentPage('dashboard');
-      }
-    } catch (error) {
-      console.error('Error fetching current user:', error);
-      // If token is invalid, clear it
-      localStorage.removeItem('token');
-    }
+  // Mock data for static preview
+  const mockCurrentUser = {
+    id: 1,
+    name: 'John Doe',
+    email: 'john@example.com',
+    role: 'user'
   };
 
-  const fetchPrograms = async () => {
-    try {
-      const token = localStorage.getItem('token');
-      const data = await apiCall(API_ENDPOINTS.PROGRAMS);
-      setPrograms(data);
-    } catch (error) {
-      console.error('Error fetching programs:', error);
+  const mockPrograms = [
+    {
+      id: 1,
+      name: 'Community Development Program',
+      budget: 50000,
+      recipientName: 'Community Center',
+      status: 'approved',
+      created_at: '2024-01-15T10:00:00Z',
+      updated_at: '2024-01-20T14:30:00Z'
+    },
+    {
+      id: 2,
+      name: 'Youth Education Initiative',
+      budget: 25000,
+      recipientName: 'Local School',
+      status: 'pending',
+      created_at: '2024-01-18T09:15:00Z',
+      updated_at: '2024-01-18T09:15:00Z'
+    },
+    {
+      id: 3,
+      name: 'Healthcare Support Program',
+      budget: 75000,
+      recipientName: 'Medical Clinic',
+      status: 'under_review',
+      created_at: '2024-01-20T11:45:00Z',
+      updated_at: '2024-01-22T16:20:00Z'
+    },
+    {
+      id: 4,
+      name: 'Environmental Conservation',
+      budget: 30000,
+      recipientName: 'Green Foundation',
+      status: 'approved',
+      created_at: '2024-01-25T08:30:00Z',
+      updated_at: '2024-01-28T12:15:00Z'
+    },
+    {
+      id: 5,
+      name: 'Senior Care Program',
+      budget: 40000,
+      recipientName: 'Elder Care Center',
+      status: 'rejected',
+      created_at: '2024-02-01T14:20:00Z',
+      updated_at: '2024-02-05T09:45:00Z'
+    },
+    {
+      id: 6,
+      name: 'Technology Training',
+      budget: 35000,
+      recipientName: 'Tech Institute',
+      status: 'draft',
+      created_at: '2024-02-10T16:00:00Z',
+      updated_at: '2024-02-10T16:00:00Z'
     }
-  };
-
-  const fetchUsers = async () => {
-    try {
-      const token = localStorage.getItem('token');
-      const data = await apiCall(API_ENDPOINTS.USERS);
-      setUsers(data);
-    } catch (error) {
-      console.error('Error fetching users:', error);
-    }
-  };
-
-  const handleLogin = async (credentials) => {
-    try {
-      const data = await apiCall(API_ENDPOINTS.LOGIN, {
-        method: 'POST',
-        body: JSON.stringify(credentials)
-      });
-      localStorage.setItem('token', data.token);
-      setCurrentUser(data);
-      setIsLoggedIn(true);
-      
-      // Set page based on role
-      if (data.role === 'admin') {
-        setCurrentPage('admin-dashboard');
-      } else if (data.role === 'staff_finance') {
-        setCurrentPage('finance-dashboard');
-      } else {
-        setCurrentPage('dashboard');
-      }
-    } catch (error) {
-      console.error('Login error:', error);
-      alert(error.message || 'An error occurred during login. Please try again.');
-    }
-  };
-
-  const handleRegister = async (userData) => {
-    try {
-      const formData = new FormData();
-      Object.keys(userData).forEach(key => {
-        if (userData[key] !== null && userData[key] !== undefined) {
-          formData.append(key, userData[key]);
-        }
-      });
-      
-      await fetch(API_ENDPOINTS.CREATE_USER, {
-        method: 'POST',
-        body: formData
-      });
-      alert('Registration successful! Please login.');
-      setCurrentPage('login');
-    } catch (error) {
-      console.error('Registration error:', error);
-      alert(error.message || 'An error occurred during registration. Please try again.');
-    }
-  };
-
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    setIsLoggedIn(false);
-    setCurrentUser(null);
-    setCurrentPage('login');
-    setPrograms([]);
-    setUsers([]);
-  };
-
-  const getNavigationItems = () => {
-    if (!currentUser) return [];
-    
-    switch (currentUser.role) {
-      case 'admin':
-        return [
-          { name: 'Dashboard', page: 'admin-dashboard' },
-          { name: 'User Management', page: 'user-management' }
-        ];
-      case 'staff_finance':
-        return [
-          { name: 'Dashboard', page: 'finance-dashboard' },
-          { name: 'Programs', page: 'programs' }
-        ];
-      default:
-        return [
-          { name: 'Dashboard', page: 'dashboard' },
-          { name: 'Apply Program', page: 'apply-program' }
-        ];
-    }
-  };
-
-  const renderPage = () => {
-    if (!currentUser) return null;
-
-    switch (currentPage) {
-      case 'admin-dashboard':
-        return currentUser.role === 'admin' ? 
-          <AdminDashboard 
-            programs={programs} 
-            users={users} 
-            setCurrentPage={setCurrentPage}
-            setPrograms={setPrograms}
-            setUsers={setUsers}
-          /> : null;
-      case 'finance-dashboard':
-        return currentUser.role === 'finance' ? 
-          <FinanceDashboard programs={programs} setPrograms={setPrograms} /> : null;
-      case 'dashboard':
-        return <Dashboard programs={programs} currentUser={currentUser} setCurrentPage={setCurrentPage} />;
-      case 'apply-program':
-        return <ApplyProgram currentUser={currentUser} onProgramAdded={fetchPrograms} />;
-      case 'user-management':
-        return currentUser.role === 'admin' ? 
-          <UserManagement users={users} setUsers={setUsers} /> : null;
-      default:
-        if (currentUser.role === 'admin') {
-          return <AdminDashboard 
-            programs={programs} 
-            users={users} 
-            setCurrentPage={setCurrentPage}
-            setPrograms={setPrograms}
-            setUsers={setUsers}
-          />;
-        } else if (currentUser.role === 'staff_finance') {
-          return <FinanceDashboard programs={programs} setPrograms={setPrograms} />;
-        } else {
-          return <Dashboard programs={programs} currentUser={currentUser} setCurrentPage={setCurrentPage} />;
-        }
-    }
-  };
-
-  if (!isLoggedIn) {
-    if (currentPage === 'register') {
-      return <Register onRegister={handleRegister} onBackToLogin={() => setCurrentPage('login')} />;
-    }
-    return <Login onLogin={handleLogin} onShowRegister={() => setCurrentPage('register')} />;
-  }
+  ];
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -206,31 +78,23 @@ function App() {
               </div>
               <div className="hidden md:block">
                 <div className="ml-10 flex items-baseline space-x-4">
-                  {getNavigationItems().map((item) => (
-                    <button
-                      key={item.page}
-                      onClick={() => setCurrentPage(item.page)}
-                      className={`${
-                        currentPage === item.page
-                          ? 'bg-blue-900 text-white'
-                          : 'text-blue-100 hover:bg-blue-700 hover:text-white'
-                      } px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200`}
-                    >
-                      {item.name}
-                    </button>
-                  ))}
+                  <button className="bg-blue-900 text-white px-3 py-2 rounded-md text-sm font-medium">
+                    Dashboard
+                  </button>
+                  <button className="text-blue-100 hover:bg-blue-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">
+                    Apply Program
+                  </button>
                 </div>
               </div>
             </div>
             <div className="flex items-center space-x-4">
               <div className="text-white text-sm">
-                <span className="font-medium">{currentUser?.name}</span>
+                <span className="font-medium">{mockCurrentUser.name}</span>
                 <span className="ml-2 px-2 py-1 bg-blue-600 rounded-full text-xs">
-                  {currentUser?.role?.toUpperCase()}
+                  {mockCurrentUser.role.toUpperCase()}
                 </span>
               </div>
               <button
-                onClick={handleLogout}
                 className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200"
               >
                 Logout
@@ -242,7 +106,7 @@ function App() {
 
       <main className="flex-1 p-8">
         <div className="max-w-7xl mx-auto">
-          {renderPage()}
+          <Dashboard programs={mockPrograms} currentUser={mockCurrentUser} setCurrentPage={() => {}} />
         </div>
       </main>
     </div>

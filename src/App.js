@@ -288,8 +288,8 @@ function App() {
                       <div className="text-red-600 font-bold text-sm">🇲🇾</div>
                     </div>
                     <div>
-                      <h1 className="text-white text-lg font-bold">SISTEM PENGURUSAN PROGRAM</h1>
-                      <p className="text-blue-200 text-xs">Program Management System</p>
+                      <h1 className="text-white text-lg font-bold">PROGRAM MANAGEMENT SYSTEM</h1>
+                      <p className="text-blue-200 text-xs">SISTEM PENGURUSAN PROGRAM</p>
                     </div>
                   </div>
                 </div>
@@ -303,7 +303,7 @@ function App() {
                           : 'text-blue-100 hover:bg-blue-700 hover:text-white'
                       }`}
                     >
-                      Papan Pemuka
+                      Dashboard
                     </button>
                     <button
                       onClick={() => setCurrentPage('apply-program')}
@@ -313,7 +313,7 @@ function App() {
                           : 'text-blue-100 hover:bg-blue-700 hover:text-white'
                       }`}
                     >
-                      Mohon Program
+                      Apply Program
                     </button>
                     {currentUser.role === 'admin' && (
                       <button
@@ -324,7 +324,7 @@ function App() {
                             : 'text-blue-100 hover:bg-blue-700 hover:text-white'
                         }`}
                       >
-                        Pengguna
+                        Users
                       </button>
                     )}
                     <button
@@ -351,7 +351,7 @@ function App() {
                   onClick={handleLogout}
                   className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200 shadow-lg"
                 >
-                  Log Keluar
+                  Logout
                 </button>
               </div>
             </div>

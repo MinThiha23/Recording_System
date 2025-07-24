@@ -278,12 +278,20 @@ function App() {
     <LanguageProvider>
       <div className="min-h-screen bg-gray-100">
         {/* Navigation */}
-        <nav className="bg-blue-800 shadow-lg">
+        <nav className="bg-gradient-to-r from-blue-900 to-blue-800 shadow-xl border-b-4 border-yellow-400">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-between h-16">
               <div className="flex items-center">
                 <div className="flex-shrink-0">
-                  <h1 className="text-white text-xl font-bold">Program Management System</h1>
+                  <div className="flex items-center space-x-3">
+                    <div className="w-10 h-10 bg-yellow-400 rounded-full flex items-center justify-center border-2 border-white">
+                      <div className="text-red-600 font-bold text-sm">🇲🇾</div>
+                    </div>
+                    <div>
+                      <h1 className="text-white text-lg font-bold">SISTEM PENGURUSAN PROGRAM</h1>
+                      <p className="text-blue-200 text-xs">Program Management System</p>
+                    </div>
+                  </div>
                 </div>
                 <div className="hidden md:block">
                   <div className="ml-10 flex items-baseline space-x-4">
@@ -291,39 +299,39 @@ function App() {
                       onClick={() => setCurrentPage('dashboard')}
                       className={`px-3 py-2 rounded-md text-sm font-medium ${
                         currentPage === 'dashboard'
-                          ? 'bg-blue-900 text-white'
+                          ? 'bg-yellow-400 text-blue-900 font-semibold'
                           : 'text-blue-100 hover:bg-blue-700 hover:text-white'
                       }`}
                     >
-                      Dashboard
+                      Papan Pemuka
                     </button>
                     <button
                       onClick={() => setCurrentPage('apply-program')}
                       className={`px-3 py-2 rounded-md text-sm font-medium ${
                         currentPage === 'apply-program'
-                          ? 'bg-blue-900 text-white'
+                          ? 'bg-yellow-400 text-blue-900 font-semibold'
                           : 'text-blue-100 hover:bg-blue-700 hover:text-white'
                       }`}
                     >
-                      Apply Program
+                      Mohon Program
                     </button>
                     {currentUser.role === 'admin' && (
                       <button
                         onClick={() => setCurrentPage('user-management')}
                         className={`px-3 py-2 rounded-md text-sm font-medium ${
                           currentPage === 'user-management'
-                            ? 'bg-blue-900 text-white'
+                            ? 'bg-yellow-400 text-blue-900 font-semibold'
                             : 'text-blue-100 hover:bg-blue-700 hover:text-white'
                         }`}
                       >
-                        Users
+                        Pengguna
                       </button>
                     )}
                     <button
                       onClick={() => setCurrentPage('status-tracking')}
                       className={`px-3 py-2 rounded-md text-sm font-medium ${
                         currentPage === 'status-tracking'
-                          ? 'bg-blue-900 text-white'
+                          ? 'bg-yellow-400 text-blue-900 font-semibold'
                           : 'text-blue-100 hover:bg-blue-700 hover:text-white'
                       }`}
                     >
@@ -335,15 +343,15 @@ function App() {
               <div className="flex items-center space-x-4">
                 <div className="text-white text-sm">
                   <span className="font-medium">{currentUser.name}</span>
-                  <span className="ml-2 px-2 py-1 bg-blue-600 rounded-full text-xs">
+                  <span className="ml-2 px-2 py-1 bg-yellow-400 text-blue-900 rounded-full text-xs font-semibold">
                     {currentUser.role.toUpperCase()}
                   </span>
                 </div>
                 <button
                   onClick={handleLogout}
-                  className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200"
+                  className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200 shadow-lg"
                 >
-                  Logout
+                  Log Keluar
                 </button>
               </div>
             </div>
@@ -351,7 +359,7 @@ function App() {
         </nav>
 
         {/* Main Content */}
-        <main className="flex-1 p-8">
+        <main className="flex-1 p-8 bg-gray-50">
           <div className="max-w-7xl mx-auto">
             {renderPage()}
           </div>
